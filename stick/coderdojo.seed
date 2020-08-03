@@ -55,7 +55,7 @@ tasksel tasksel/first                                       multiselect Basic Ub
 d-i pkgsel/upgrade                                          select      none
 d-i pkgsel/update-policy                                    select      unattended-upgrades
 d-i pkgsel/updatedb                                         boolean     true
-d-i pkgsel/include                                          string      ruby vim git
+d-i pkgsel/include                                          string      ruby vim git network-manager
 
 # disk partitioning
 d-i partman/confirm_write_new_label                         boolean     true

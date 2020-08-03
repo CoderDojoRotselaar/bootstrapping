@@ -34,6 +34,8 @@ fi
 
 case "$NAME" in
 Fedora)
+  dnf -y update
+
   if ! command -v puppet >/dev/null; then
     echo "Puppet not yet installed - installing now..."
     if ! rpm -q puppet-release; then
@@ -47,14 +49,17 @@ Fedora)
   GEM_INSTALL_PARAMS=""
   ;;
 Ubuntu)
+  apt update
+  apt -y dist-upgrade
+  
   if ! command -v puppet >/dev/null; then
     echo "Puppet not yet installed - installing now..."
     if ! dpkg -l puppet-release; then
       curl -sSL https://apt.puppetlabs.com/puppet-release-bionic.deb >/tmp/puppet-release.deb
       dpkg -i /tmp/puppet-release.deb
       rm -f /tmp/puppet-release.deb
+      apt update
     fi
-    apt update
     apt -y install puppet-agent git-core
   fi
   if ! command -v ruby >/dev/null; then
