@@ -49,6 +49,7 @@ Fedora)
   GEM_INSTALL_PARAMS=""
   ;;
 Ubuntu)
+  systemctl stop unattended-upgrades
   apt update
   apt -y dist-upgrade
   
