@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+  # Run an apt-cacher-ng service to limit external bandwidth
+  apt-cacher-ng:
+    image: sameersbn/apt-cacher-ng:latest
+    command: bash -c "tail -F /var/log/apt-cacher-ng/apt-cacher.log & /usr/sbin/apt-cacher-ng -c /etc/apt-cacher-ng"
+    network_mode: host
+    volumes:
+      - ./tmp/apt-cacher-ng/:/var/cache/apt-cacher-ng/
+
+  # Run a DHCP, DNS, PXE server:
+  # You should modify the dhcpd.conf file to suit your network!
+  installer:
+    image: instantlinux/dhcpd-dns-pxe
+    environment:
+      DHCP_RANGE: 192.168.0.140 192.168.0.160
+      IP_FORWARDING: "false"
+      DNS_ENABLE: "no"
+      DNS_SERVER: 8.8.8.8
+      DHCP_SUBNET1: 192.168.0.0
+      SUBNET1_GATEWAY: 192.168.0.1
+      SUBNET1_NETMASK: 255.255.255.0
+      SUBNET1_INTERFACE: enp0s31f6
+    volumes:
+      - ./pxelinux/:/tftpboot/pxelinux/:ro
+      - ./empty.conf:/etc/dhcpd.d/local/empty.conf:ro
+    network_mode: host
