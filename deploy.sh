@@ -50,9 +50,7 @@ Fedora)
   ;;
 Ubuntu)
   systemctl stop unattended-upgrades
-  apt update
-  apt -y dist-upgrade
-  
+
   if ! command -v puppet >/dev/null; then
     echo "Puppet not yet installed - installing now..."
     if ! dpkg -l puppet-release; then
@@ -83,6 +81,7 @@ if [[ ! -d "${REPOSITORY_ROOT}" ]]; then
   git clone --depth 1 https://github.com/CoderDojoRotselaar/os-config "${REPOSITORY_ROOT}"
 fi
 
+${REPOSITORY_ROOT}/puppet-apply.sh --tags early
 ${REPOSITORY_ROOT}/puppet-apply.sh
 rmdir /.deploy
 
