@@ -84,6 +84,13 @@ fi
 export FACTER_deploy=true
 
 ${REPOSITORY_ROOT}/puppet-apply.sh --tags early
+
+case "$NAME" in
+Ubuntu)
+  apt update
+  ;;
+esac
+
 ${REPOSITORY_ROOT}/puppet-apply.sh
 rmdir /.deploy
 
