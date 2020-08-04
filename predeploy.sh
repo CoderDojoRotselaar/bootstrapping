@@ -7,6 +7,8 @@ chmod a+x /usr/local/sbin/deploy.sh
 cat <<EOF >/etc/systemd/system/auto-deploy.service
 [Unit]
 Description=predeploy script
+Wants=network-online.target
+After=network-online.target
 ConditionPathExists=/.deploy
 
 [Service]
