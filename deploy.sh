@@ -81,6 +81,8 @@ if [[ ! -d "${REPOSITORY_ROOT}" ]]; then
   git clone --depth 1 https://github.com/CoderDojoRotselaar/os-config "${REPOSITORY_ROOT}"
 fi
 
+export FACTER_deploy=true
+
 ${REPOSITORY_ROOT}/puppet-apply.sh --tags early
 ${REPOSITORY_ROOT}/puppet-apply.sh
 rmdir /.deploy
