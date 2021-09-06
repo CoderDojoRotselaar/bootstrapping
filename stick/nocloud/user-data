@@ -1,0 +1,158 @@
+#cloud-config
+autoinstall:
+  version: 1
+  interactive-sections:
+    - network
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64, i386]
+        uri: http://be.archive.ubuntu.com/ubuntu
+      - arches: [default]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+    conf: |
+      Acquire::Retries "5";
+      Acquire::Queue-Mode "access";
+
+  kernel: { package: linux-generic }
+  keyboard: { layout: us, toggle: null, variant: "" }
+  locale: en_US.UTF-8
+  #proxy: http://192.168.0.4:3142
+  storage:
+    config:
+      - {
+          ptable: gpt,
+          path: /dev/sda,
+          wipe: superblock-recursive,
+          preserve: false,
+          name: "",
+          grub_device: true,
+          type: disk,
+          id: disk-sda,
+        }
+      - {
+          device: disk-sda,
+          size: 1GB,
+          flag: bios_grub,
+          number: 1,
+          preserve: false,
+          grub_device: false,
+          type: partition,
+          id: partition-sda1,
+        }
+      - {
+          device: disk-sda,
+          size: 30GB,
+          wipe: superblock,
+          flag: linux,
+          number: 2,
+          preserve: false,
+          grub_device: false,
+          type: partition,
+          id: partition-sda2,
+        }
+
+      - name: coderdojo
+        devices: [partition-sda2]
+        preserve: false
+        type: lvm_volgroup
+        id: lvm_volgroup-0
+
+      - {
+          name: root,
+          volgroup: lvm_volgroup-0,
+          size: 10GB,
+          wipe: superblock,
+          preserve: false,
+          type: lvm_partition,
+          id: lvm_partition-0,
+        }
+      - {
+          fstype: ext4,
+          volume: lvm_partition-0,
+          preserve: false,
+          type: format,
+          id: format-0,
+        }
+      - { path: /, device: format-0, type: mount, id: mount-0 }
+
+      - {
+          name: var,
+          volgroup: lvm_volgroup-0,
+          size: 10GB,
+          wipe: superblock,
+          preserve: false,
+          type: lvm_partition,
+          id: lvm_partition-1,
+        }
+      - {
+          fstype: ext4,
+          volume: lvm_partition-1,
+          preserve: false,
+          type: format,
+          id: format-1,
+        }
+      - { path: /var, device: format-1, type: mount, id: mount-1 }
+
+      - {
+          name: home,
+          volgroup: lvm_volgroup-0,
+          size: 5GB,
+          wipe: superblock,
+          preserve: false,
+          type: lvm_partition,
+          id: lvm_partition-2,
+        }
+      - {
+          fstype: ext4,
+          volume: lvm_partition-2,
+          preserve: false,
+          type: format,
+          id: format-2,
+        }
+      - { path: /home, device: format-2, type: mount, id: mount-2 }
+
+      - {
+          name: boot,
+          volgroup: lvm_volgroup-0,
+          size: 1GB,
+          wipe: superblock,
+          preserve: false,
+          type: lvm_partition,
+          id: lvm_partition-3,
+        }
+      - {
+          fstype: ext4,
+          volume: lvm_partition-3,
+          preserve: false,
+          type: format,
+          id: format-3,
+        }
+      - { path: /boot, device: format-3, type: mount, id: mount-3 }
+  updates: security
+
+  packages:
+    - ruby
+    - vim
+    - git
+    - network-manager
+
+  late-commands:
+    - growpart /dev/sda 2 && pvresize /dev/sda2 # Resize the primary partition
+    - test -f /cdrom/nocloud/secrets.sh && bash /cdrom/nocloud/secrets.sh # Check for a secrets.sh file, and execute it
+    - bash -x /cdrom/nocloud/deploy.sh # Run the main deploy script
+    - "sed -i '/dhcp4:/a\\      optional: true' /target/etc/netplan/*.yaml" # Don't wait for network at boot
+
+  identity:
+    hostname: coderdojo
+    password: "$6$XTj1xyhI$Ku8xdtmejyS0h/1wBIcLt8LBPoV2n7UBzKM7cCrQyd3CEyd.NeRrldfL05SHaQVGkgSopvDVt8fRX/6mbzuPL/"
+    username: coderdojo
+
+final_message: "CoderDojo image is ready"
+
+power_state:
+  mode: reboot
+  message: Bye Bye
+  timeout: 10
+  condition: True

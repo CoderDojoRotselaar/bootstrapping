@@ -1,4 +1,4 @@
-The installation procedure is based on Ubuntu 18.04 LTS Bionic. The upgrade to Ubuntu 20.04 LTS Focal will be a big change, since the installation procedure has changed a lot.
+The installation procedure is based on Ubuntu 20.04 LTS Focal.
 
 Attention: the procedures detailed below will completely wipe the target devices!
 
@@ -6,71 +6,39 @@ Attention: the procedures detailed below will completely wipe the target devices
 
 The necessary tools are provided to build your own stick. You can find them in the `stick` folder.
 
-During the installation, you will get this prompt three times:
-
-> [!] Partition disks
->
-> Installation medium on /dev/sdb2
->
-> Your installation medium is on /dev/sdb2. You will not be able to create, delete, or resize partitions on this disk, but you may be able to install to existing partitions there.
->
-> \<Continue\>
-
-It should be OK to simply continue (press enter) at this prompt (3x). If the medium starts with `/dev/sda`, you should stop - the hard disk was not correctly found, and you will probably break your USB stick.
-
-## Customize parameters
-
-Create a file `unattended-parameters.env` (look at the given example) to customize.
-
-Internet is needed during installation; a network cable is the easiest, but you can configure Wi-Fi during installation too. Add this to the `unattended-parameters.env` file:
-
-```bash
-extra_preseed="
-# Wi-Fi settings - wlp12s0 is the device name of the wifi adapter, it might be different on your devices
-d-i  netcfg/choose_interface        select  wlp12s0
-d-i  netcfg/wireless_show_essids    select  mySSID
-d-i  netcfg/wireless_security_type  select  wpa
-d-i  netcfg/wireless_wpa            string  MyPassword
-"
-```
-
-Attention: the installer will ask you to confirm the ESSID early in the installation process. Your choice should be highlighted if it is found in the air.
-
-If you have an `apt-cacher-ng` running, you can add this line to the `extra_preseed` (change the IP):
+If you have an `apt-cacher-ng` running, you can uncomment and change this line in the `user-data` file (change the IP):
 
 ```text
-d-i  mirror/http/proxy  string  http://192.168.0.4:3142/
+proxy: http://192.168.0.4:3142
 ```
 
 ## Secrets
 
-You can also provide a script to initialize secrets. The example uses `secret-initializer.sh` as filename, but you can change this. It should be a Bash-compliant shell script.
+You can also provide a script to initialize secrets. The provided `user-data` checks if a file `secrets.sh` is present in the `nocloud` directory, and executes it. It should be a Bash-compliant shell script.
 
 ## Create ISO
 
-When you finished the configuration files, you can create the ISO. If the original ISO is not present yet, it will be downloaded automatically. Download and create the final ISO with this command:
+When you finished the configuration files, you can create the ISO. If the original ISO is not present yet, you will get a warning. The first time, this will unpack the downloaded iso into a directory called `iso`.
+
+Create the final iso with:
 
 ```bash
-$ sudo ./create-unattended-iso.sh
+$ ./create-unattended-iso.sh
 
- +---------------------------------------------------+
- |            UNATTENDED UBUNTU ISO MAKER            |
- +---------------------------------------------------+
-
- downloading ubuntu-18.04.4-server-amd64.iso:  DONE
- remastering your iso file
- creating the remastered iso
- -----
- finished remastering your ubuntu iso file
- the new file is located at: /path/to/coderdojo-unattended-bionic.iso
- your username is: coderdojo
- your hostname is: coderdojo
- your timezone is: Europe/Brussels
+7-Zip [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
+[...]
+created directory iso/nocloud
+[...]
+xorriso 1.5.4 : RockRidge filesystem manipulator, libburnia project.
+[...]
+Writing to 'stdio:coderdojo-autoinstall.iso' completed successfully.
 ```
+
+You should now find a new iso `coderdojo-autoinstall.iso` in your workdir.
 
 This ISO can be used as an image on an USB stick or a DVD to install devices. The easiest way is to make a bootable USB stick using [Ventoy](https://github.com/ventoy/Ventoy) and add the ISO to the USB stick.
 
-# Network boot installation
+# Network boot installation (not updated for 20.04!)
 
 There is a fully-automated network installation option, that runs in Docker. It supports `apt-cacher-ng` to limit external bandwidth. The cache will easily take more than 1 GB of disk space.
 
