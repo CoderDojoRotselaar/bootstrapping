@@ -33,43 +33,51 @@ EOF
 fi
 
 case "$NAME" in
-Fedora)
-  dnf -y update
+  Fedora)
+    dnf -y update
 
-  if ! command -v puppet >/dev/null; then
-    echo "Puppet not yet installed - installing now..."
-    if ! rpm -q puppet-release; then
-      dnf -y install https://yum.puppetlabs.com/puppet-release-fedora-30.noarch.rpm
+    if ! command -v puppet >/dev/null; then
+      echo "Puppet not yet installed - installing now..."
+      if ! rpm -q puppet-release; then
+        dnf -y install https://yum.puppetlabs.com/puppet-release-fedora-30.noarch.rpm
+      fi
+      dnf -y install puppet-agent git-core
     fi
-    dnf -y install puppet-agent git-core
-  fi
-  if ! command -v ruby >/dev/null; then
-    dnf -y install ruby
-  fi
-  GEM_INSTALL_PARAMS=""
-  ;;
-Ubuntu)
-  systemctl stop unattended-upgrades
+    if ! command -v ruby >/dev/null; then
+      dnf -y install ruby
+    fi
+    GEM_INSTALL_PARAMS=""
+    ;;
+  Ubuntu)
+    systemctl stop unattended-upgrades
 
-  if ! command -v puppet >/dev/null; then
-    echo "Puppet not yet installed - installing now..."
-    if ! dpkg -l puppet-release; then
-      curl -sSL https://apt.puppetlabs.com/puppet-release-bionic.deb >/tmp/puppet-release.deb
-      dpkg -i /tmp/puppet-release.deb
-      rm -f /tmp/puppet-release.deb
-      apt update
+    if ! command -v puppet >/dev/null; then
+      echo "Puppet not yet installed - installing now..."
+      if ! dpkg -l puppet-release; then
+        curl -sSL https://apt.puppetlabs.com/puppet-release-bionic.deb >/tmp/puppet-release.deb
+        dpkg -i /tmp/puppet-release.deb
+        rm -f /tmp/puppet-release.deb
+        apt update
+      fi
+      apt -y install puppet-agent git-core
     fi
-    apt -y install puppet-agent git-core
-  fi
-  if ! command -v ruby >/dev/null; then
-    apt -y install ruby
-  fi
-  GEM_INSTALL_PARAMS="--no-ri --no-rdoc"
-  ;;
-*)
-  echo "Unknown/unsupported operating system. Bailing out." >&2
-  exit 1
-  ;;
+    if ! command -v ruby >/dev/null; then
+      apt -y install ruby
+    fi
+
+    case "${VERSION_ID}" in
+      1*)
+        GEM_INSTALL_PARAMS="--no-ri --no-rdoc"
+        ;;
+      2*)
+        GEM_INSTALL_PARAMS=""
+        ;;
+    esac
+    ;;
+  *)
+    echo "Unknown/unsupported operating system. Bailing out." >&2
+    exit 1
+    ;;
 esac
 
 if ! command -v librarian-puppet >/dev/null; then
@@ -86,9 +94,9 @@ export FACTER_deploy=true
 ${REPOSITORY_ROOT}/puppet-apply.sh --tags early
 
 case "$NAME" in
-Ubuntu)
-  apt update
-  ;;
+  Ubuntu)
+    apt update
+    ;;
 esac
 
 ${REPOSITORY_ROOT}/puppet-apply.sh
