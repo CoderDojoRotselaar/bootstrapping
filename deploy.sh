@@ -80,9 +80,9 @@ case "$NAME" in
     ;;
 esac
 
-if ! command -v r10k >/dev/null; then
-  echo "R10k not yet installed - installing now..."
-  gem install $GEM_INSTALL_PARAMS r10k
+if ! command -v librarian-puppet >/dev/null; then
+  echo "Librarian-puppet not yet installed - installing now..."
+  gem install $GEM_INSTALL_PARAMS librarian-puppet
 fi
 
 if [[ ! -d "${REPOSITORY_ROOT}" ]]; then
