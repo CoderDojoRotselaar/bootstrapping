@@ -1,11 +1,20 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-# Needed tools: 7z, xorriso
+# Needed tools: 7z, xorriso, isolinux
 
 ISO="isos/ubuntu-20.04.3-live-server-amd64.iso"
 
 if [[ ! -f "${ISO}" ]]; then
   echo "You should download the Ubuntu 20.04.3 live server iso to '${ISO}'"
+  exit 1
+fi
+
+for file in /usr/lib/ISOLINUX/isohdpfx.bin /usr/share/syslinux/isohdpfx.bin; do
+  [[ -f "${file}" ]] && ISOLINUX="${file}"
+done
+
+if [[ -z "${ISOLINUX}" ]]; then
+  echo "Could not find isohdpfx.bin; you may need to install the isolinux package..."
   exit 1
 fi
 
@@ -36,5 +45,5 @@ xorriso -as mkisofs -r \
   -boot-load-size 4 -boot-info-table \
   -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
   -isohybrid-gpt-basdat -isohybrid-apm-hfsplus \
-  -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin \
+  -isohybrid-mbr "${ISOLINUX}" \
   iso/boot iso

@@ -5,6 +5,7 @@ Attention: the procedures detailed below will completely wipe the target devices
 # Build your own installation stick
 
 The necessary tools are provided to build your own stick. You can find them in the `stick` folder.
+Copy `user-data.example` to `user-data` and make some changes as you see fit.
 
 If you have an `apt-cacher-ng` running, you can uncomment and change this line in the `user-data` file (change the IP):
 
