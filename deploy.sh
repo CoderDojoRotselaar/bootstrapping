@@ -51,20 +51,18 @@ case "$NAME" in
   Ubuntu)
     systemctl stop unattended-upgrades
 
-    apt-get -yy update && apt-get -yy dist-upgrade && apt-get -yy autoremove
-
     if ! command -v puppet >/dev/null; then
       echo "Puppet not yet installed - installing now..."
       if ! dpkg -l puppet-release; then
         curl -sSL https://apt.puppetlabs.com/puppet-release-focal.deb >/tmp/puppet-release.deb
         dpkg -i /tmp/puppet-release.deb
         rm -f /tmp/puppet-release.deb
-        apt update
+        apt-get update
       fi
-      apt -y install puppet-agent git-core
+      apt-get -yy install puppet-agent git-core
     fi
     if ! command -v ruby >/dev/null; then
-      apt -y install ruby
+      apt-get -yy install ruby
     fi
 
     case "${VERSION_ID}" in
@@ -97,7 +95,7 @@ ${REPOSITORY_ROOT}/puppet-apply.sh --tags early
 
 case "$NAME" in
   Ubuntu)
-    apt update
+    apt-get -yy update && apt-get -yy dist-upgrade && apt-get -yy autopurge
     ;;
 esac
 
