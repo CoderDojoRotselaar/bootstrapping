@@ -51,7 +51,7 @@ case "$NAME" in
   Ubuntu)
     systemctl stop unattended-upgrades
 
-    apt -yy update && apt -yy dist-upgrade
+    apt-get -yy update && apt-get -yy dist-upgrade && apt-get -yy autoremove
 
     if ! command -v puppet >/dev/null; then
       echo "Puppet not yet installed - installing now..."
