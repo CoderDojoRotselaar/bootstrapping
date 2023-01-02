@@ -2,7 +2,7 @@
 
 # Needed tools: 7z, xorriso, isolinux
 
-ISO="isos/ubuntu-20.04.3-live-server-amd64.iso"
+ISO="isos/ubuntu-22.04.1-desktop-amd64.iso"
 
 if [[ ! -f "${ISO}" ]]; then
   echo "You should download the Ubuntu 20.04.3 live server iso to '${ISO}'"
