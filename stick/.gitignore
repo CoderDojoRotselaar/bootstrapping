@@ -2,3 +2,4 @@ iso/
 secrets.sh
 user-data
 *.iso
+\[BOOT\]/

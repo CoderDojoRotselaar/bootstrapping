@@ -56,10 +56,11 @@ autoinstall:
         number: 2
         preserve: false
         type: partition
-        id: partition-1
+        id: partition-2
+        grub_device: false
 
       - name: coderdojo
-        devices: [partition-1]
+        devices: [partition-2]
         preserve: false
         type: lvm_volgroup
         id: lvm_volgroup-0
@@ -115,22 +116,6 @@ autoinstall:
         type: mount
         id: mount-home
 
-      - name: boot
-        volgroup: lvm_volgroup-0
-        size: 1GB
-        wipe: superblock
-        preserve: false
-        type: lvm_partition
-        id: lvm_partition-boot
-      - fstype: ext4
-        volume: lvm_partition-boot
-        preserve: false
-        type: format
-        id: format-boot
-      - path: /boot
-        device: format-boot
-        type: mount
-        id: mount-boot
   updates: security
 
   packages:
